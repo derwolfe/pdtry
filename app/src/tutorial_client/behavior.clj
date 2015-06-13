@@ -18,10 +18,21 @@
 (defn publish-counter [count]
   [{msg/type :swap msg/topic [:other-counters] :value count}])
 
+(defn total-count [_ nums] (apply + nums))
+
+(defn maximum [old-value nums]
+  (apply max (or old-value 0) nums))
+
+
 (def example-app
   {:version 2
    :transform [[:inc  [:my-counter] inc-transform]
                [:swap [:**]         swap-transform]]
+   :derive #{[#{[:my-counter] [:other-counters :*]} [:total-count] total-count :vals]
+             [#{[:my-counter] [:other-counters :*]} [:max-count] maximum :vals]}
    :effect #{[#{[:my-counter]} publish-counter :single-val]}
    :emit [{:init init-main}
-          [#{[:my-counter] [:other-counters :*]} (app/default-emitter [:main])]]})
+          [#{[:my-counter]
+             [:other-counters :*]
+             [:total-count]
+             [:max-count]} (app/default-emitter [:main])]]})
