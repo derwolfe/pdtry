@@ -23,16 +23,23 @@
 (defn maximum [old-value nums]
   (apply max (or old-value 0) nums))
 
+(defn average-count [_ {:keys [total nums]}]
+  (/ total (count nums)))
 
 (def example-app
   {:version 2
    :transform [[:inc  [:my-counter] inc-transform]
                [:swap [:**]         swap-transform]]
    :derive #{[#{[:my-counter] [:other-counters :*]} [:total-count] total-count :vals]
-             [#{[:my-counter] [:other-counters :*]} [:max-count] maximum :vals]}
+             [#{[:my-counter] [:other-counters :*]} [:max-count] maximum :vals]
+             [{[:my-counter] :nums
+               [:other-counters :*] :nums
+               [:total-count] :total}
+              [:average-count] average-count :map]}
    :effect #{[#{[:my-counter]} publish-counter :single-val]}
    :emit [{:init init-main}
           [#{[:my-counter]
              [:other-counters :*]
              [:total-count]
-             [:max-count]} (app/default-emitter [:main])]]})
+             [:max-count]
+             [:average-count]} (app/default-emitter [:main])]]})
