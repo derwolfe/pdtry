@@ -1,5 +1,6 @@
 (ns ^:shared tutorial-client.behavior
     (:require [clojure.string :as string]
+              [io.pedestal.app :as app]
               [io.pedestal.app.messages :as msg]))
 
 (defn set-value-transform [old-value message]
@@ -10,4 +11,5 @@
 
 (def example-app
   {:version 2
-   :transform [[:set-value [:greeting] set-value-transform]]})
+   :transform [[:inc [:my-counter] inc-transform]]
+   :emit [[#{[:*]} (app/default-emitter [:main])]]})

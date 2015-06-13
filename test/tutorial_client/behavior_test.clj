@@ -39,3 +39,21 @@
               @app-model)
            [["x"]]))))
 
+
+(defn- data-model [app]
+  (-> app :state deref :data-model))
+
+
+(deftest test-app-state
+  (let [app (app/build example-app)]
+    (is (test/run-sync! app [{msg/type :inc msg/topic [:my-counter]}]
+                        :begin :default))
+    (is (= (data-model app)
+           {:my-counter 1})))
+  (let [app (app/build example-app)]
+    (is (test/run-sync! app [{msg/type :inc msg/topic [:my-counter]}
+                             {msg/type :inc msg/topic [:my-counter]}
+                             {msg/type :inc msg/topic [:my-counter]}]
+                        :begin :default))
+    (is (= (data-model app)
+           {:my-counter 3}))))
