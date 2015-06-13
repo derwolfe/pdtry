@@ -31,8 +31,10 @@
 
 (def example-app
   {:version 2
+   :debug true
    :transform [[:inc  [:my-counter] inc-transform]
-               [:swap [:**]         swap-transform]]
+               [:swap [:**]         swap-transform]
+               [:debug [:pedestal :**] swap-transform]]
    :derive #{[{[:my-counter] :me [:other-counters] :others} [:counters] merge-counters :map]
           [#{[:counters :*]} [:total-count] total-count :vals]
           [#{[:counters :*]} [:max-count] maximum :vals]
@@ -43,4 +45,5 @@
              [:other-counters :*]
              [:total-count]
              [:max-count]
-             [:average-count]} (app/default-emitter [:main])]]})
+             [:average-count]
+             [:pedestal :debug :*]} (app/default-emitter [:main])]]})
